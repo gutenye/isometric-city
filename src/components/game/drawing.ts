@@ -877,3 +877,63 @@ export function drawHill(
     }
   }
 }
+
+const TUNNEL_COLORS = {
+  tube: '#0f172a',
+  frame: '#9ca3af',
+  opening: '#111827',
+  frameStroke: '#4b5563',
+} as const;
+
+export function drawTunnel(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  building: { bridgeOrientation?: 'ns' | 'ew'; bridgePosition?: 'start' | 'middle' | 'end' },
+  currentZoom: number
+): void {
+  const w = TILE_WIDTH;
+  const c = getDiamondCorners(x, y);
+  const mid = (p: { x: number; y: number }, q: { x: number; y: number }) => ({
+    x: (p.x + q.x) / 2,
+    y: (p.y + q.y) / 2,
+  });
+  const ns = building.bridgeOrientation !== 'ew';
+  const a = ns ? mid(c.top, c.left) : mid(c.top, c.right);
+  const b = ns ? mid(c.right, c.bottom) : mid(c.left, c.bottom);
+
+  ctx.save();
+  ctx.globalAlpha = 0.4;
+  ctx.strokeStyle = TUNNEL_COLORS.tube;
+  ctx.lineWidth = w * 0.16;
+  ctx.setLineDash([w * 0.14, w * 0.1]);
+  ctx.beginPath();
+  ctx.moveTo(a.x, a.y);
+  ctx.lineTo(b.x, b.y);
+  ctx.stroke();
+  ctx.restore();
+
+  const portalAt = (p: { x: number; y: number }) => {
+    const r = w * 0.16;
+    ctx.fillStyle = TUNNEL_COLORS.frame;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, r, Math.PI, 0);
+    ctx.closePath();
+    ctx.fill();
+    ctx.fillStyle = TUNNEL_COLORS.opening;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, r * 0.65, Math.PI, 0);
+    ctx.closePath();
+    ctx.fill();
+    if (currentZoom >= 0.6) {
+      ctx.strokeStyle = TUNNEL_COLORS.frameStroke;
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, r, Math.PI, 0);
+      ctx.closePath();
+      ctx.stroke();
+    }
+  };
+  if (building.bridgePosition === 'start') portalAt(a);
+  if (building.bridgePosition === 'end') portalAt(b);
+}

@@ -52,6 +52,7 @@ import {
   drawBeachOnWater,
   drawFoundationPlot,
   drawHill,
+  drawTunnel,
 } from '@/components/game/drawing';
 import {
   getOverlayFillStyle,
@@ -1332,7 +1333,12 @@ export function CanvasIsometricGrid({ overlayMode, selectedTile, setSelectedTile
       
       // Handle bridges with special rendering
       if (buildingType === 'bridge') {
-        drawBridgeTile(ctx, x, y, tile.building, tile.x, tile.y, zoom);
+        if (tile.building.isTunnel) {
+          drawWaterTileAt(ctx, x, y, tile.x, tile.y);
+          drawTunnel(ctx, x, y, tile.building, zoom);
+        } else {
+          drawBridgeTile(ctx, x, y, tile.building, tile.x, tile.y, zoom);
+        }
         return;
       }
 
@@ -2266,12 +2272,12 @@ export function CanvasIsometricGrid({ overlayMode, selectedTile, setSelectedTile
     }
     
     // Draw road/rail drag preview with bridge validity indication
-    if (isDragging && (selectedTool === 'road' || selectedTool === 'rail') && dragStartTile && dragEndTile) {
+    if (isDragging && (selectedTool === 'road' || selectedTool === 'rail' || selectedTool === 'tunnel') && dragStartTile && dragEndTile) {
       const minX = Math.min(dragStartTile.x, dragEndTile.x);
       const maxX = Math.max(dragStartTile.x, dragEndTile.x);
       const minY = Math.min(dragStartTile.y, dragEndTile.y);
       const maxY = Math.max(dragStartTile.y, dragEndTile.y);
-      
+
       // Collect all tiles in the path
       const pathTiles: { x: number; y: number; isWater: boolean }[] = [];
       for (let x = minX; x <= maxX; x++) {
@@ -2347,9 +2353,9 @@ export function CanvasIsometricGrid({ overlayMode, selectedTile, setSelectedTile
             }
           }
           
-          const isValidBridge = (hasLandBefore || hasExistingLandBefore) && 
+          const isValidBridge = (hasLandBefore || hasExistingLandBefore) &&
                                 (hasLandAfter || hasExistingLandAfter) &&
-                                waterLength <= 10; // Max bridge span
+                                (selectedTool === 'tunnel' || waterLength <= 10); // Max bridge span (tunnels are unlimited)
           
           // Mark all water tiles in this segment
           for (let j = waterStart; j <= waterEnd; j++) {
@@ -2598,7 +2604,7 @@ export function CanvasIsometricGrid({ overlayMode, selectedTile, setSelectedTile
           // Place immediately on first click
           placeAtTile(gridX, gridY);
           // Track initial tile for roads, rail, and subways
-          if (selectedTool === 'road' || selectedTool === 'rail' || selectedTool === 'subway') {
+          if (selectedTool === 'road' || selectedTool === 'rail' || selectedTool === 'subway' || selectedTool === 'tunnel') {
             placedRoadTilesRef.current.add(`${gridX},${gridY}`);
           }
         }
@@ -2732,7 +2738,7 @@ export function CanvasIsometricGrid({ overlayMode, selectedTile, setSelectedTile
           setDragEndTile({ x: gridX, y: gridY });
         }
         // For roads, rail, and subways, use straight-line snapping
-        else if (isDragging && (selectedTool === 'road' || selectedTool === 'rail' || selectedTool === 'subway') && dragStartTile) {
+        else if (isDragging && (selectedTool === 'road' || selectedTool === 'rail' || selectedTool === 'subway' || selectedTool === 'tunnel') && dragStartTile) {
           const dx = Math.abs(gridX - dragStartTile.x);
           const dy = Math.abs(gridY - dragStartTile.y);
           
@@ -2815,7 +2821,7 @@ export function CanvasIsometricGrid({ overlayMode, selectedTile, setSelectedTile
     }
     
     // After placing roads or rail, create bridges for valid water crossings and check for city discovery
-    if (isDragging && (selectedTool === 'road' || selectedTool === 'rail') && dragStartTile && dragEndTile) {
+    if (isDragging && (selectedTool === 'road' || selectedTool === 'rail' || selectedTool === 'tunnel') && dragStartTile && dragEndTile) {
       // Collect all tiles in the drag path
       const minX = Math.min(dragStartTile.x, dragEndTile.x);
       const maxX = Math.max(dragStartTile.x, dragEndTile.x);
@@ -2830,7 +2836,7 @@ export function CanvasIsometricGrid({ overlayMode, selectedTile, setSelectedTile
       }
       
       // Create bridges for valid water crossings in the drag path
-      finishTrackDrag(pathTiles, selectedTool as 'road' | 'rail');
+      finishTrackDrag(pathTiles, selectedTool as 'road' | 'rail' | 'tunnel');
       
       // Use setTimeout to allow state to update first, then check for discoverable cities
       setTimeout(() => {

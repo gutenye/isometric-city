@@ -23,7 +23,7 @@ export type GameAction =
   | (BaseAction & { type: 'setBudget'; key: keyof Budget; funding: number })
   | (BaseAction & { type: 'setSpeed'; speed: 0 | 1 | 2 | 3 })
   | (BaseAction & { type: 'setDisasters'; enabled: boolean })
-  | (BaseAction & { type: 'createBridges'; pathTiles: Array<{ x: number; y: number }>; trackType: 'road' | 'rail' })
+  | (BaseAction & { type: 'createBridges'; pathTiles: Array<{ x: number; y: number }>; trackType: 'road' | 'rail' | 'tunnel' })
   | (BaseAction & { type: 'setParkSettings'; settings: Partial<ParkSettings> })
   | (BaseAction & { type: 'coasterStartBuild'; coasterType: CoasterType; coasterId: string })
   | (BaseAction & { type: 'coasterFinishBuild' })
@@ -39,7 +39,7 @@ export type SetTaxRateAction = { type: 'setTaxRate'; rate: number };
 export type SetBudgetAction = { type: 'setBudget'; key: keyof Budget; funding: number };
 export type SetSpeedAction = { type: 'setSpeed'; speed: 0 | 1 | 2 | 3 };
 export type SetDisastersAction = { type: 'setDisasters'; enabled: boolean };
-export type CreateBridgesAction = { type: 'createBridges'; pathTiles: Array<{ x: number; y: number }>; trackType: 'road' | 'rail' };
+export type CreateBridgesAction = { type: 'createBridges'; pathTiles: Array<{ x: number; y: number }>; trackType: 'road' | 'rail' | 'tunnel' };
 export type SetParkSettingsAction = { type: 'setParkSettings'; settings: Partial<ParkSettings> };
 export type CoasterStartBuildAction = { type: 'coasterStartBuild'; coasterType: CoasterType; coasterId: string };
 export type CoasterFinishBuildAction = { type: 'coasterFinishBuild' };

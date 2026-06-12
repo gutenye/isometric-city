@@ -227,7 +227,7 @@ const UI_LABELS = {
 };
 
 const toolCategories = {
-  'TOOLS': ['select', 'bulldoze', 'road', 'rail', 'subway'] as Tool[],
+  'TOOLS': ['select', 'bulldoze', 'road', 'tunnel', 'rail', 'subway'] as Tool[],
   'ZONES': ['zone_residential', 'zone_commercial', 'zone_industrial'] as Tool[],
   'ZONING': ['zone_dezone', 'zone_water', 'zone_land'] as Tool[],
   'UTILITIES': ['power_plant', 'water_tower', 'subway_station', 'rail_station'] as Tool[],

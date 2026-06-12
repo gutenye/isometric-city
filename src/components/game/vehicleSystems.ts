@@ -1441,6 +1441,7 @@ export function useVehicleSystems(
     ctx.translate(currentOffset.x / currentZoom, currentOffset.y / currentZoom);
     
     carsRef.current.forEach(car => {
+      if (currentGrid[car.tileY]?.[car.tileX]?.building.isTunnel) return;
       const { screenX, screenY } = gridToScreen(car.tileX, car.tileY, 0, 0);
       const centerX = screenX + TILE_WIDTH / 2;
       const centerY = screenY + TILE_HEIGHT / 2;

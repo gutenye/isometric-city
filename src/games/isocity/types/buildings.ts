@@ -53,6 +53,7 @@ export interface Building {
   bridgeIndex?: number;
   bridgeSpan?: number;
   bridgeTrackType?: BridgeTrackType;
+  isTunnel?: boolean;
 }
 
 export const RESIDENTIAL_BUILDINGS: BuildingType[] = ['house_small', 'house_medium', 'mansion', 'apartment_low', 'apartment_high'];

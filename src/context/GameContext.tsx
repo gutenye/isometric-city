@@ -67,8 +67,8 @@ type GameContextValue = {
   upgradeServiceBuilding: (x: number, y: number) => boolean; // Returns true if upgrade succeeded
   placeAtTile: (x: number, y: number, isRemote?: boolean) => void;
   setPlaceCallback: (callback: ((args: { x: number; y: number; tool: Tool }) => void) | null) => void;
-  finishTrackDrag: (pathTiles: { x: number; y: number }[], trackType: 'road' | 'rail', isRemote?: boolean) => void; // Create bridges after road/rail drag
-  setBridgeCallback: (callback: ((args: { pathTiles: { x: number; y: number }[]; trackType: 'road' | 'rail' }) => void) | null) => void;
+  finishTrackDrag: (pathTiles: { x: number; y: number }[], trackType: 'road' | 'rail' | 'tunnel', isRemote?: boolean) => void; // Create bridges after road/rail drag
+  setBridgeCallback: (callback: ((args: { pathTiles: { x: number; y: number }[]; trackType: 'road' | 'rail' | 'tunnel' }) => void) | null) => void;
   connectToCity: (cityId: string) => void;
   discoverCity: (cityId: string) => void;
   checkAndDiscoverCities: (onDiscover?: (city: { id: string; direction: 'north' | 'south' | 'east' | 'west'; name: string }) => void) => void;
@@ -113,6 +113,7 @@ function clamp(value: number, min: number, max: number) {
 
 const toolBuildingMap: Partial<Record<Tool, BuildingType>> = {
   road: 'road',
+  tunnel: 'road',
   rail: 'rail',
   rail_station: 'rail_station',
   tree: 'tree',
@@ -659,7 +660,7 @@ export function GameProvider({ children, startFresh = false }: { children: React
   
   // Callback for multiplayer action broadcast
   const placeCallbackRef = useRef<((args: { x: number; y: number; tool: Tool }) => void) | null>(null);
-  const bridgeCallbackRef = useRef<((args: { pathTiles: { x: number; y: number }[]; trackType: 'road' | 'rail' }) => void) | null>(null);
+  const bridgeCallbackRef = useRef<((args: { pathTiles: { x: number; y: number }[]; trackType: 'road' | 'rail' | 'tunnel' }) => void) | null>(null);
   
   // Sprite pack state
   const [currentSpritePack, setCurrentSpritePack] = useState<SpritePack>(() => getSpritePack(DEFAULT_SPRITE_PACK_ID));
@@ -989,8 +990,8 @@ export function GameProvider({ children, startFresh = false }: { children: React
   }, []);
 
   // Called after a road/rail drag operation to create bridges for water crossings
-  const finishTrackDrag = useCallback((pathTiles: { x: number; y: number }[], trackType: 'road' | 'rail', isRemote = false) => {
-    setState((prev) => createBridgesOnPath(prev, pathTiles, trackType));
+  const finishTrackDrag = useCallback((pathTiles: { x: number; y: number }[], trackType: 'road' | 'rail' | 'tunnel', isRemote = false) => {
+    setState((prev) => createBridgesOnPath(prev, pathTiles, trackType === 'tunnel' ? 'road' : trackType, trackType === 'tunnel'));
     
     // Broadcast to multiplayer if this is a local action (not remote)
     if (!isRemote && bridgeCallbackRef.current) {
@@ -1102,7 +1103,7 @@ export function GameProvider({ children, startFresh = false }: { children: React
     placeCallbackRef.current = callback;
   }, []);
 
-  const setBridgeCallback = useCallback((callback: ((args: { pathTiles: { x: number; y: number }[]; trackType: 'road' | 'rail' }) => void) | null) => {
+  const setBridgeCallback = useCallback((callback: ((args: { pathTiles: { x: number; y: number }[]; trackType: 'road' | 'rail' | 'tunnel' }) => void) | null) => {
     bridgeCallbackRef.current = callback;
   }, []);
 

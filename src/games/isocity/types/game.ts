@@ -9,7 +9,7 @@ import { Stats, Budget, CityEconomy, HistoryPoint } from './economy';
 import { ServiceCoverage } from './services';
 
 export type Tool =
-  | 'select' | 'bulldoze' | 'road' | 'rail' | 'subway'
+  | 'select' | 'bulldoze' | 'road' | 'rail' | 'subway' | 'tunnel'
   | 'expand_city' | 'shrink_city' | 'tree' | 'hill'
   | 'zone_residential' | 'zone_commercial' | 'zone_industrial' | 'zone_dezone'
   | 'zone_water' | 'zone_land'
@@ -38,6 +38,7 @@ export const TOOL_INFO: Record<Tool, ToolInfo> = {
   road: { name: msg('Road'), cost: 25, description: msg('Connect your city') },
   rail: { name: msg('Rail'), cost: 40, description: msg('Build railway tracks') },
   subway: { name: msg('Subway'), cost: 50, description: msg('Underground transit') },
+  tunnel: { name: msg('Tunnel'), cost: 100, description: msg('Road tunnel that crosses under water') },
   expand_city: { name: msg('Expand City'), cost: 0, description: msg('Add 15 tiles to each edge') },
   shrink_city: { name: msg('Shrink City'), cost: 0, description: msg('Remove 15 tiles from each edge') },
   tree: { name: msg('Tree'), cost: 15, description: msg('Plant trees to improve environment') },

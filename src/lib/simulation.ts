@@ -829,10 +829,12 @@ function createBridgeBuilding(
   position: 'start' | 'middle' | 'end',
   index: number,
   span: number,
-  trackType: 'road' | 'rail' = 'road'
+  trackType: 'road' | 'rail' = 'road',
+  isTunnel = false
 ): Building {
   return {
     type: 'bridge',
+    isTunnel,
     level: 0,
     population: 0,
     jobs: 0,
@@ -888,7 +890,8 @@ function scanForBridgeInDirection(
   dx: number,
   dy: number,
   orientation: BridgeOrientation,
-  trackType: 'road' | 'rail'
+  trackType: 'road' | 'rail',
+  unlimitedSpan = false
 ): BridgeOpportunity | null {
   const waterTiles: { x: number; y: number }[] = [];
   let x = startX + dx;
@@ -902,7 +905,7 @@ function scanForBridgeInDirection(
       waterTiles.push({ x, y });
       
       // Check if we've exceeded max bridge span
-      if (waterTiles.length > MAX_BRIDGE_SPAN) {
+      if (!unlimitedSpan && waterTiles.length > MAX_BRIDGE_SPAN) {
         return null; // Too wide to bridge
       }
     } else if (tile.building.type === trackType) {
@@ -947,7 +950,8 @@ function detectBridgeOpportunity(
   gridSize: number,
   x: number,
   y: number,
-  trackType: 'road' | 'rail'
+  trackType: 'road' | 'rail',
+  unlimitedSpan = false
 ): BridgeOpportunity | null {
   const tile = grid[y]?.[x];
   if (!tile) return null;
@@ -960,19 +964,19 @@ function detectBridgeOpportunity(
   
   // Check each direction for water followed by same track type
   // North (x-1, y stays same in grid coords)
-  const northOpp = scanForBridgeInDirection(grid, gridSize, x, y, -1, 0, 'ns', trackType);
+  const northOpp = scanForBridgeInDirection(grid, gridSize, x, y, -1, 0, 'ns', trackType, unlimitedSpan);
   if (northOpp) return northOpp;
-  
+
   // South (x+1, y stays same)
-  const southOpp = scanForBridgeInDirection(grid, gridSize, x, y, 1, 0, 'ns', trackType);
+  const southOpp = scanForBridgeInDirection(grid, gridSize, x, y, 1, 0, 'ns', trackType, unlimitedSpan);
   if (southOpp) return southOpp;
-  
+
   // East (x stays, y-1)
-  const eastOpp = scanForBridgeInDirection(grid, gridSize, x, y, 0, -1, 'ew', trackType);
+  const eastOpp = scanForBridgeInDirection(grid, gridSize, x, y, 0, -1, 'ew', trackType, unlimitedSpan);
   if (eastOpp) return eastOpp;
-  
+
   // West (x stays, y+1)
-  const westOpp = scanForBridgeInDirection(grid, gridSize, x, y, 0, 1, 'ew', trackType);
+  const westOpp = scanForBridgeInDirection(grid, gridSize, x, y, 0, 1, 'ew', trackType, unlimitedSpan);
   if (westOpp) return westOpp;
   
   return null;
@@ -981,7 +985,8 @@ function detectBridgeOpportunity(
 /** Build bridges by converting water tiles to bridge tiles */
 function buildBridges(
   grid: Tile[][],
-  opportunity: BridgeOpportunity
+  opportunity: BridgeOpportunity,
+  isTunnel = false
 ): void {
   const variant = getBridgeVariant(
     opportunity.waterTiles[0].x,
@@ -1021,7 +1026,8 @@ function buildBridges(
       position,
       index,
       span,
-      opportunity.trackType
+      opportunity.trackType,
+      isTunnel
     );
     // Keep the tile as having no zone
     grid[pos.y][pos.x].zone = 'none';
@@ -1034,12 +1040,13 @@ function checkAndCreateBridges(
   gridSize: number,
   placedX: number,
   placedY: number,
-  trackType: 'road' | 'rail'
+  trackType: 'road' | 'rail',
+  isTunnel = false
 ): void {
   // Check for bridge opportunities from the placed tile
-  const opportunity = detectBridgeOpportunity(grid, gridSize, placedX, placedY, trackType);
+  const opportunity = detectBridgeOpportunity(grid, gridSize, placedX, placedY, trackType, isTunnel);
   if (opportunity) {
-    buildBridges(grid, opportunity);
+    buildBridges(grid, opportunity, isTunnel);
   }
 }
 
@@ -1060,7 +1067,8 @@ function checkAndCreateBridges(
 export function createBridgesOnPath(
   state: GameState,
   pathTiles: { x: number; y: number }[],
-  trackType: 'road' | 'rail' = 'road'
+  trackType: 'road' | 'rail' = 'road',
+  isTunnel = false
 ): GameState {
   if (pathTiles.length === 0) return state;
   
@@ -1082,7 +1090,7 @@ export function createBridgesOnPath(
   for (const tile of pathTiles) {
     // Only check from actual track type tiles (not water or other types)
     if (newGrid[tile.y]?.[tile.x]?.building.type === trackType) {
-      checkAndCreateBridges(newGrid, state.gridSize, tile.x, tile.y, trackType);
+      checkAndCreateBridges(newGrid, state.gridSize, tile.x, tile.y, trackType, isTunnel);
     }
   }
   
