@@ -73,6 +73,7 @@ const GREEN_POLLUTION_REDUCERS = new Set<BuildingType>([
   'park_gate',
   'campground',
   'mountain_trailhead',
+  'hill',
 ]);
 
 function getPollutionCleanupProfile(buildingType: BuildingType): { radius: number; strength: number } | null {
@@ -1810,6 +1811,7 @@ function calculateStats(grid: Tile[][], size: number, budget: Budget, taxRate: n
       }
 
       if (building.type === 'tree') treeCount++;
+      if (building.type === 'hill') treeCount++;
       if (building.type === 'water') waterCount++;
       if (building.type === 'park' || building.type === 'park_large') parkCount++;
       if (building.type === 'tennis') parkCount++; // Tennis courts count as parks

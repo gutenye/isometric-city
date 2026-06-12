@@ -21,7 +21,7 @@ const BUILDING_TYPES: BuildingType[] = [
   'bleachers_field', 'go_kart_track', 'amphitheater', 'greenhouse_garden',
   'animal_pens_farm', 'cabin_house', 'campground', 'marina_docks_small', 'pier_large',
   'roller_coaster_small', 'community_garden', 'pond_park', 'park_gate',
-  'mountain_lodge', 'mountain_trailhead'
+  'mountain_lodge', 'mountain_trailhead', 'hill'
 ];
 
 const BUILDING_MAP: Record<BuildingType, number> = BUILDING_TYPES.reduce((acc, type, idx) => {

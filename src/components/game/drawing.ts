@@ -796,3 +796,84 @@ export function drawBeachOnWater(
     );
   }
 }
+
+const HILL_COLORS = {
+  light: '#8fbf6f',
+  base: '#4a7c3f',
+  shade: 'rgba(28, 48, 22, 0.28)',
+  highlight: 'rgba(255, 255, 255, 0.10)',
+  stroke: '#2d4a26',
+} as const;
+
+export function drawHill(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  gridX: number,
+  gridY: number,
+  currentZoom: number
+): void {
+  const w = TILE_WIDTH;
+  const h = TILE_HEIGHT;
+  const corners = getDiamondCorners(x, y);
+  const seed = ((gridX * 7919 + gridY * 6271) % 1000) / 1000;
+  const peakX = x + w / 2 + (seed - 0.5) * w * 0.12;
+  const peakY = y - h * (0.75 + seed * 0.3);
+
+  const silhouette = () => {
+    ctx.beginPath();
+    ctx.moveTo(corners.left.x, corners.left.y);
+    ctx.bezierCurveTo(
+      corners.left.x + w * 0.08, corners.left.y - h * 0.8,
+      peakX - w * 0.16, peakY + h * 0.12,
+      peakX, peakY
+    );
+    ctx.bezierCurveTo(
+      peakX + w * 0.16, peakY + h * 0.12,
+      corners.right.x - w * 0.08, corners.right.y - h * 0.8,
+      corners.right.x, corners.right.y
+    );
+    ctx.lineTo(corners.bottom.x, corners.bottom.y);
+    ctx.closePath();
+  };
+
+  const grad = ctx.createLinearGradient(0, peakY, 0, corners.bottom.y);
+  grad.addColorStop(0, HILL_COLORS.light);
+  grad.addColorStop(1, HILL_COLORS.base);
+  silhouette();
+  ctx.fillStyle = grad;
+  ctx.fill();
+
+  ctx.beginPath();
+  ctx.moveTo(corners.left.x, corners.left.y);
+  ctx.bezierCurveTo(
+    corners.left.x + w * 0.08, corners.left.y - h * 0.8,
+    peakX - w * 0.16, peakY + h * 0.12,
+    peakX, peakY
+  );
+  ctx.bezierCurveTo(
+    peakX - w * 0.02, peakY + h * 0.6,
+    corners.bottom.x - w * 0.06, corners.bottom.y - h * 0.5,
+    corners.bottom.x, corners.bottom.y
+  );
+  ctx.closePath();
+  ctx.fillStyle = HILL_COLORS.shade;
+  ctx.fill();
+
+  if (currentZoom >= 0.6) {
+    silhouette();
+    ctx.strokeStyle = HILL_COLORS.stroke;
+    ctx.lineWidth = 0.5;
+    ctx.stroke();
+
+    ctx.fillStyle = HILL_COLORS.highlight;
+    for (let i = 0; i < 3; i++) {
+      const t = ((gridX * 31 + gridY * 17 + i * 53) % 100) / 100;
+      const tuftX = peakX + (t - 0.5) * w * 0.45;
+      const tuftY = peakY + h * (0.35 + t * 0.5);
+      ctx.beginPath();
+      ctx.ellipse(tuftX, tuftY, w * 0.05, h * 0.05, 0, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+}

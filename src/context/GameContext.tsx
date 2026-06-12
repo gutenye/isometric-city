@@ -116,6 +116,7 @@ const toolBuildingMap: Partial<Record<Tool, BuildingType>> = {
   rail: 'rail',
   rail_station: 'rail_station',
   tree: 'tree',
+  hill: 'hill',
   police_station: 'police_station',
   fire_station: 'fire_station',
   hospital: 'hospital',

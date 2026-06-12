@@ -3,7 +3,7 @@
  */
 
 export type BuildingType =
-  | 'empty' | 'grass' | 'water' | 'road' | 'bridge' | 'rail' | 'tree'
+  | 'empty' | 'grass' | 'water' | 'road' | 'bridge' | 'rail' | 'tree' | 'hill'
   // Residential
   | 'house_small' | 'house_medium' | 'mansion' | 'apartment_low' | 'apartment_high'
   // Commercial
@@ -67,6 +67,7 @@ export const BUILDING_STATS: Record<BuildingType, { maxPop: number; maxJobs: num
   bridge: { maxPop: 0, maxJobs: 0, pollution: 1, landValue: 5 },
   rail: { maxPop: 0, maxJobs: 0, pollution: 1, landValue: -2 },
   tree: { maxPop: 0, maxJobs: 0, pollution: -5, landValue: 2 },
+  hill: { maxPop: 0, maxJobs: 0, pollution: -5, landValue: 4 },
   house_small: { maxPop: 6, maxJobs: 0, pollution: 0, landValue: 10 },
   house_medium: { maxPop: 14, maxJobs: 0, pollution: 0, landValue: 22 },
   mansion: { maxPop: 18, maxJobs: 0, pollution: 0, landValue: 60 },

@@ -51,6 +51,7 @@ import {
   drawGreyBaseTile,
   drawBeachOnWater,
   drawFoundationPlot,
+  drawHill,
 } from '@/components/game/drawing';
 import {
   getOverlayFillStyle,
@@ -1332,6 +1333,11 @@ export function CanvasIsometricGrid({ overlayMode, selectedTile, setSelectedTile
       // Handle bridges with special rendering
       if (buildingType === 'bridge') {
         drawBridgeTile(ctx, x, y, tile.building, tile.x, tile.y, zoom);
+        return;
+      }
+
+      if (buildingType === 'hill') {
+        drawHill(ctx, x, y, tile.x, tile.y, zoom);
         return;
       }
       

@@ -10,7 +10,7 @@ import { ServiceCoverage } from './services';
 
 export type Tool =
   | 'select' | 'bulldoze' | 'road' | 'rail' | 'subway'
-  | 'expand_city' | 'shrink_city' | 'tree'
+  | 'expand_city' | 'shrink_city' | 'tree' | 'hill'
   | 'zone_residential' | 'zone_commercial' | 'zone_industrial' | 'zone_dezone'
   | 'zone_water' | 'zone_land'
   | 'police_station' | 'fire_station' | 'hospital' | 'school' | 'university'
@@ -41,6 +41,7 @@ export const TOOL_INFO: Record<Tool, ToolInfo> = {
   expand_city: { name: msg('Expand City'), cost: 0, description: msg('Add 15 tiles to each edge') },
   shrink_city: { name: msg('Shrink City'), cost: 0, description: msg('Remove 15 tiles from each edge') },
   tree: { name: msg('Tree'), cost: 15, description: msg('Plant trees to improve environment') },
+  hill: { name: msg('Hill'), cost: 100, description: msg('Raise a grassy hill') },
   zone_residential: { name: msg('Residential'), cost: 50, description: msg('Zone for housing') },
   zone_commercial: { name: msg('Commercial'), cost: 50, description: msg('Zone for shops and offices') },
   zone_industrial: { name: msg('Industrial'), cost: 50, description: msg('Zone for factories') },

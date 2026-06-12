@@ -154,12 +154,13 @@ export function useBuildingHelpers(grid: Tile[][], gridSize: number) {
           buildingType !== 'road' &&
           buildingType !== 'bridge' &&
           buildingType !== 'rail' &&
-          buildingType !== 'tree';
+          buildingType !== 'tree' &&
+          buildingType !== 'hill';
         const isPartOfBuilding = buildingType === 'empty' && isPartOfMultiTileBuilding;
         const needsGreyBase = (isDirectBuilding || isPartOfBuilding) && !isPark;
         
         // Compute green base needs
-        const hasGreenBase = buildingType === 'grass' || buildingType === 'empty' || buildingType === 'tree';
+        const hasGreenBase = buildingType === 'grass' || buildingType === 'empty' || buildingType === 'tree' || buildingType === 'hill';
         const needsGreenBaseOverWater = hasGreenBase && isAdjacentToWater;
         const needsGreenBaseForPark = (buildingType === 'park' || buildingType === 'park_large') ||
                                       (buildingType === 'empty' && isPartOfParkBuilding);
