@@ -61,7 +61,7 @@ import {
   OVERLAY_CIRCLE_FILL_COLORS,
   OVERLAY_HIGHLIGHT_COLORS,
 } from '@/components/game/overlays';
-import { SERVICE_CONFIG, SERVICE_RANGE_INCREASE_PER_LEVEL } from '@/lib/simulation';
+import { SERVICE_CONFIG, SERVICE_RANGE_INCREASE_PER_LEVEL, getPollutionCleanupProfile } from '@/lib/simulation';
 import { drawPlaceholderBuilding } from '@/components/game/placeholders';
 import { loadImage, loadSpriteImage, onImageLoaded, getCachedImage } from '@/components/game/imageLoader';
 import { TileInfoPanel } from '@/components/game/panels';
@@ -2225,6 +2225,28 @@ export function CanvasIsometricGrid({ overlayMode, selectedTile, setSelectedTile
     
     // Draw hovered tile highlight (with multi-tile preview for buildings)
     if (hoveredTile && hoveredTile.x >= 0 && hoveredTile.x < gridSize && hoveredTile.y >= 0 && hoveredTile.y < gridSize) {
+      // Show the effect radius before placing (service coverage or pollution cleanup)
+      const drawRadiusPreview = (range: number, strokeColor: string, fillColor: string) => {
+        const { screenX, screenY } = gridToScreen(hoveredTile.x, hoveredTile.y, 0, 0);
+        const centerX = screenX + TILE_WIDTH / 2;
+        const centerY = screenY + TILE_HEIGHT / 2;
+        ctx.strokeStyle = strokeColor;
+        ctx.lineWidth = 2 / zoom;
+        ctx.beginPath();
+        ctx.ellipse(centerX, centerY, range * TILE_WIDTH / 2, range * TILE_HEIGHT / 2, 0, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.fillStyle = fillColor;
+        ctx.fill();
+      };
+      const serviceConfig = SERVICE_CONFIG[selectedTool as keyof typeof SERVICE_CONFIG];
+      if (serviceConfig && 'range' in serviceConfig) {
+        drawRadiusPreview(serviceConfig.range, 'rgba(96, 165, 250, 0.9)', 'rgba(96, 165, 250, 0.12)');
+      } else {
+        const cleanup = getPollutionCleanupProfile(selectedTool as BuildingType);
+        if (cleanup) {
+          drawRadiusPreview(cleanup.radius, 'rgba(74, 222, 128, 0.9)', 'rgba(74, 222, 128, 0.12)');
+        }
+      }
       // Check if selectedTool is a building type (not a non-building tool)
       const nonBuildingTools: Tool[] = ['select', 'bulldoze', 'road', 'rail', 'subway', 'tree', 'zone_residential', 'zone_commercial', 'zone_industrial', 'zone_dezone', 'zone_water', 'zone_land'];
       const isBuildingTool = selectedTool && !nonBuildingTools.includes(selectedTool);

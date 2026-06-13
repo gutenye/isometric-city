@@ -76,7 +76,7 @@ const GREEN_POLLUTION_REDUCERS = new Set<BuildingType>([
   'hill',
 ]);
 
-function getPollutionCleanupProfile(buildingType: BuildingType): { radius: number; strength: number } | null {
+export function getPollutionCleanupProfile(buildingType: BuildingType): { radius: number; strength: number } | null {
   if (!GREEN_POLLUTION_REDUCERS.has(buildingType)) return null;
 
   const pollution = BUILDING_STATS[buildingType]?.pollution ?? 0;
